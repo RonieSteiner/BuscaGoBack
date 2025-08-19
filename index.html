@@ -49,13 +49,18 @@
       color: #555;
     }
 
-    #novaPesquisaBtn {
+    #novaPesquisa {
       display: none;
       margin-top: 20px;
       background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      cursor: pointer;
     }
 
-    #novaPesquisaBtn:hover {
+    #novaPesquisa:hover {
       background-color: #1976D2;
     }
   </style>
@@ -68,20 +73,25 @@
   </form>
 
   <div id="resultado"></div>
-  <button id="novaPesquisaBtn">Nova Pesquisa</button>
+  <button id="novaPesquisa">Nova Pesquisa</button>
 
   <script>
-    document.getElementById("cepForm").addEventListener("submit", function(e) {
+    const form = document.getElementById("cepForm");
+    const resultado = document.getElementById("resultado");
+    const novaPesquisa = document.getElementById("novaPesquisa");
+
+    form.addEventListener("submit", function(e) {
       e.preventDefault();
-      var cep = document.getElementById("cepInput").value.trim();
+      const cep = document.getElementById("cepInput").value.trim();
 
       if (cep === "") {
-        document.getElementById("resultado").innerText = "Por favor, digite um CEP.";
-        document.getElementById("novaPesquisaBtn").style.display = "inline-block";
+        resultado.innerText = "Por favor, digite um CEP.";
+        novaPesquisa.style.display = "inline-block";
+        form.style.display = "none";
         return;
       }
 
-      var url = "https://script.google.com/macros/s/AKfycbwo4pkYhY9h_Ec_5y9n99mSKFoziF33DgIUlQtH7hBG-gMK-MCWjiw0oL-IiJas4B9I-A/exec?cep=" + encodeURIComponent(cep);
+      const url = "https://script.google.com/macros/s/AKfycbwo4pkYhY9h_Ec_5y9n99mSKFoziF33DgIUlQtH7hBG-gMK-MCWjiw0oL-IiJas4B9I-A/exec?cep=" + encodeURIComponent(cep);
 
       fetch(url)
         .then(response => {
@@ -91,17 +101,26 @@
           return response.text();
         })
         .then(data => {
-          document.getElementById("resultado").innerText = data;
-          document.getElementById("novaPesquisaBtn").style.display = "inline-block";
+          let mensagem = "";
+          if (data.toLowerCase().includes("não encontrado")) {
+            mensagem = `CEP ${cep} não encontrado.`;
+          } else {
+            mensagem = `CEP ${cep} encontrado.`;
+          }
+
+          resultado.innerText = mensagem;
+          novaPesquisa.style.display = "inline-block";
+          form.style.display = "none";
         })
         .catch(error => {
           console.error("Erro:", error);
-          document.getElementById("resultado").innerText = "Erro ao consultar o CEP.";
-          document.getElementById("novaPesquisaBtn").style.display = "inline-block";
+          resultado.innerText = `Erro ao consultar o CEP ${cep}.`;
+          novaPesquisa.style.display = "inline-block";
+          form.style.display = "none";
         });
     });
 
-    document.getElementById("novaPesquisaBtn").addEventListener("click", function() {
+    novaPesquisa.addEventListener("click", function() {
       location.reload();
     });
   </script>
