@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de CEP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 200px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #resultado {
+      margin-top: 30px;
+      font-size: 18px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Consulta de CEP</h1>
+  <form id="cepForm">
+    <input type="text" id="cepInput" placeholder="Digite o CEP" required>
+    <button type="submit">Consultar</button>
+  </form>
+  <div id="resultado"></div>
+
+  <script>
+    document.getElementById("cepForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var cep = document.getElementById("cepInput").value.trim();
+
+      if (cep === "") {
+        document.getElementById("resultado").innerText = "Por favor, digite um CEP.";
+        return;
+      }
+
+      fetch("https://script.google.com/macros/s/AKfycbwo4pkYhY9h_Ec_5y9n99mSKFoziF33DgIUlQtH7hBG-gMK-MCWjiw0oL-IiJas4B9I-A/exec?cep=" + cep)
+        .then(response => response.text())
+        .then(data => {
+          document.getElementById("resultado").innerText = data;
+        })
+        .catch(error => {
+          document.getElementById("resultado").innerText = "Erro ao consultar o CEP.";
+          console.error("Erro:", error);
+        });
+    });
+  </script>
+</body>
+</html>
