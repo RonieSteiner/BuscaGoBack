@@ -48,6 +48,16 @@
       font-size: 18px;
       color: #555;
     }
+
+    #novaPesquisaBtn {
+      display: none;
+      margin-top: 20px;
+      background-color: #2196F3;
+    }
+
+    #novaPesquisaBtn:hover {
+      background-color: #1976D2;
+    }
   </style>
 </head>
 <body>
@@ -56,38 +66,44 @@
     <input type="text" id="cepInput" placeholder="Digite o CEP" required>
     <button type="submit">Consultar</button>
   </form>
+
   <div id="resultado"></div>
+  <button id="novaPesquisaBtn">Nova Pesquisa</button>
 
   <script>
-  document.getElementById("cepForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-    var cep = document.getElementById("cepInput").value.trim();
-  
-    if (cep === "") {
-      document.getElementById("resultado").innerText = "Por favor, digite um CEP.";
-      return;
-    }
-  
-    // Monta a URL corretamente
-    var url = "https://script.google.com/macros/s/AKfycbwo4pkYhY9h_Ec_5y9n99mSKFoziF33DgIUlQtH7hBG-gMK-MCWjiw0oL-IiJas4B9I-A/exec?cep=" + encodeURIComponent(cep);
-  
-    fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("Erro na resposta da API");
-        }
-        return response.text();
-      })
-      .then(data => {
-        document.getElementById("resultado").innerText = data;
-      })
-      .catch(error => {
-        console.error("Erro:", error);
-        document.getElementById("resultado").innerText = "Erro ao consultar o CEP.";
-      });
-  });
+    document.getElementById("cepForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      var cep = document.getElementById("cepInput").value.trim();
+
+      if (cep === "") {
+        document.getElementById("resultado").innerText = "Por favor, digite um CEP.";
+        document.getElementById("novaPesquisaBtn").style.display = "inline-block";
+        return;
+      }
+
+      var url = "https://script.google.com/macros/s/AKfycbwo4pkYhY9h_Ec_5y9n99mSKFoziF33DgIUlQtH7hBG-gMK-MCWjiw0oL-IiJas4B9I-A/exec?cep=" + encodeURIComponent(cep);
+
+      fetch(url)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("Erro na resposta da API");
+          }
+          return response.text();
+        })
+        .then(data => {
+          document.getElementById("resultado").innerText = data;
+          document.getElementById("novaPesquisaBtn").style.display = "inline-block";
+        })
+        .catch(error => {
+          console.error("Erro:", error);
+          document.getElementById("resultado").innerText = "Erro ao consultar o CEP.";
+          document.getElementById("novaPesquisaBtn").style.display = "inline-block";
+        });
+    });
+
+    document.getElementById("novaPesquisaBtn").addEventListener("click", function() {
+      location.reload();
+    });
   </script>
-
-
 </body>
 </html>
