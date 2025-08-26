@@ -1,4 +1,105 @@
-<script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Consulta de CEP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+      padding: 40px;
+      text-align: center;
+      display: flex; /* Para centralizar o conteúdo */
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh; /* Ocupa a altura total da viewport */
+      margin: 0;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    form {
+      margin-top: 20px;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      padding: 12px;
+      width: 250px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      box-sizing: border-box; /* Inclui padding e borda no width */
+    }
+
+    button {
+      padding: 12px 25px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #resultado {
+      margin-top: 30px;
+      font-size: 20px;
+      color: #333;
+      font-weight: bold;
+      padding: 20px;
+      background-color: #e9e9e9;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+      min-width: 300px; /* Garante um tamanho mínimo para o resultado */
+    }
+
+    #novaPesquisa {
+      display: none; /* Inicia oculto */
+      margin-top: 25px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 25px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #novaPesquisa:hover {
+      background-color: #1976D2;
+    }
+  </style>
+</head>
+<body>
+  <h1>Consulta de CEP</h1>
+  
+  <form id="cepForm">
+    <input type="text" id="cepInput" placeholder="Digite o CEP" required maxlength="8">
+    <button type="submit">Consultar</button>
+  </form>
+
+  <div id="resultado"></div>
+  <button id="novaPesquisa">Nova Pesquisa</button>
+
+  <script>
     const form = document.getElementById("cepForm");
     const resultado = document.getElementById("resultado");
     const novaPesquisa = document.getElementById("novaPesquisa");
@@ -9,12 +110,20 @@
 
       if (cep === "") {
         resultado.innerText = "Por favor, digite um CEP.";
+        // Exibe o resultado e o botão "Nova Pesquisa", esconde o formulário
+        resultado.style.display = "block"; // Garante que o resultado esteja visível
         novaPesquisa.style.display = "inline-block";
         form.style.display = "none";
         return;
       }
 
-      const url = "https://script.google.com/macros/s/AKfycbyGjCOy6S4LWOJtyxdqFh85w23Of0S39jqUrPOty7g_cwVb5J4Fha-28wUIgD7o0RuChA/exec" + encodeURIComponent(cep); // USE SEU NOVO URL DO APPS SCRIPT
+      // CORREÇÃO DA URL: Adicionado "?cep="
+      const url = "https://script.google.com/macros/s/AKfycbyGjCOy6S4LWOJtyxdqFh85w23Of0S39jqUrPOty7g_cwVb5J4Fha-28wUIgD7o0RuChA/exec?cep=" + encodeURIComponent(cep);
+
+      // Esconde o formulário imediatamente e mostra uma mensagem de carregamento
+      form.style.display = "none";
+      resultado.innerText = "Consultando CEP, aguarde...";
+      resultado.style.display = "block"; // Garante que a mensagem de carregamento apareça
 
       fetch(url)
         .then(response => {
@@ -35,17 +144,24 @@
 
           resultado.innerText = mensagem;
           novaPesquisa.style.display = "inline-block";
-          form.style.display = "none";
+          // O formulário já está escondido, apenas atualiza o resultado e mostra o botão
         })
         .catch(error => {
           console.error("Erro:", error);
-          resultado.innerText = `Erro ao consultar o CEP ${cep}.`;
+          resultado.innerText = `Erro ao consultar o CEP ${cep}. Por favor, tente novamente.`;
           novaPesquisa.style.display = "inline-block";
-          form.style.display = "none";
+          // O formulário já está escondido
         });
     });
 
     novaPesquisa.addEventListener("click", function() {
-      location.reload();
+      location.reload(); // Recarrega a página para resetar o estado
+    });
+
+    // Garante que o resultado esteja oculto no carregamento inicial da página
+    document.addEventListener("DOMContentLoaded", function() {
+        resultado.style.display = "none";
     });
   </script>
+</body>
+</html>
