@@ -1,81 +1,4 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Consulta de CEP</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-      padding: 40px;
-      text-align: center;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    form {
-      margin-top: 20px;
-    }
-
-    input[type="text"] {
-      padding: 10px;
-      width: 200px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin-left: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    #resultado {
-      margin-top: 30px;
-      font-size: 18px;
-      color: #555;
-    }
-
-    #novaPesquisa {
-      display: none;
-      margin-top: 20px;
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 10px 20px;
-      cursor: pointer;
-    }
-
-    #novaPesquisa:hover {
-      background-color: #1976D2;
-    }
-  </style>
-</head>
-<body>
-  <h1>Consulta de CEP</h1>
-  <form id="cepForm">
-    <input type="text" id="cepInput" placeholder="Digite o CEP" required>
-    <button type="submit">Consultar</button>
-  </form>
-
-  <div id="resultado"></div>
-  <button id="novaPesquisa">Nova Pesquisa</button>
-
-  <script>
+<script>
     const form = document.getElementById("cepForm");
     const resultado = document.getElementById("resultado");
     const novaPesquisa = document.getElementById("novaPesquisa");
@@ -91,21 +14,23 @@
         return;
       }
 
-      const url = "https://script.google.com/macros/s/AKfycbwo4pkYhY9h_Ec_5y9n99mSKFoziF33DgIUlQtH7hBG-gMK-MCWjiw0oL-IiJas4B9I-A/exec?cep=" + encodeURIComponent(cep);
+      const url = "NOVO_URL_DO_SEU_APPS_SCRIPT_AQUI?cep=" + encodeURIComponent(cep); // USE SEU NOVO URL DO APPS SCRIPT
 
       fetch(url)
         .then(response => {
           if (!response.ok) {
             throw new Error("Erro na resposta da API");
           }
-          return response.text();
+          return response.text(); // A resposta é um texto
         })
         .then(data => {
           let mensagem = "";
+          // Verifica se a resposta é "não encontrado" (minúsculas para robustez)
           if (data.toLowerCase().includes("não encontrado")) {
             mensagem = `CEP ${cep} não encontrado.`;
           } else {
-            mensagem = `CEP ${cep} encontrado.`;
+            // Se não for "não encontrado", assume que é o conteúdo da coluna C
+            mensagem = `CEP ${cep} encontrado! Conteúdo relacionado: "${data}"`; 
           }
 
           resultado.innerText = mensagem;
@@ -124,5 +49,3 @@
       location.reload();
     });
   </script>
-</body>
-</html>
