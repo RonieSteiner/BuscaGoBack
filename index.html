@@ -10,11 +10,11 @@
       background-color: #f2f2f2;
       padding: 40px;
       text-align: center;
-      display: flex; 
+      display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh; /* Ocupa a altura total da viewport */
+      min-height: 100vh;
       margin: 0;
     }
 
@@ -41,7 +41,7 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 6px;
-      box-sizing: border-box; /* Inclui padding e borda no width */
+      box-sizing: border-box;
     }
 
     button {
@@ -68,7 +68,7 @@
       background-color: #e9e9e9;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-      min-width: 300px; /* Garante um tamanho mínimo para o resultado */
+      min-width: 300px;
     }
 
     #novaPesquisa {
@@ -110,55 +110,60 @@
 
       if (cep === "") {
         resultado.innerText = "Por favor, digite um CEP.";
-        // Exibe o resultado e o botão "Nova Pesquisa", esconde o formulário
-        resultado.style.display = "block"; // Garante que o resultado esteja visível
+        resultado.style.display = "block"; 
         novaPesquisa.style.display = "inline-block";
         form.style.display = "none";
         return;
       }
 
-      // CORREÇÃO DA URL: Adicionado "?cep="
-      const url = "https://script.google.com/macros/s/AKfycbw9_gBN0uUQ_zyGPtyfEdXDetmg5K15Y6Us-qHYTJXxNvzsMX9I-fn1-d5z7kdyi0zmtQ/exec?cep=" + encodeURIComponent(cep);
+      // ATUALIZE ESTE URL COM O SEU NOVO URL DE IMPLANTAÇÃO DO APPS SCRIPT
+      const url = "https://script.google.com/macros/s/AKfycbyGjCOy6S4LWOJtyxdqFh85w23Of0S39jqUrPOty7g_cwVb5J4Fha-28wUIgD7o0RuChA/exec?cep=" + encodeURIComponent(cep);
 
       // Esconde o formulário imediatamente e mostra uma mensagem de carregamento
       form.style.display = "none";
       resultado.innerText = "Consultando CEP, aguarde...";
-      resultado.style.display = "block"; // Garante que a mensagem de carregamento apareça
+      resultado.style.display = "block";
 
       fetch(url)
         .then(response => {
           if (!response.ok) {
-            throw new Error("Erro na resposta da API");
+            throw new Error("Erro na resposta da API: Status " + response.status);
           }
-          return response.text(); // A resposta é um texto
+          return response.json(); // AGORA ESPERAMOS UM JSON
         })
         .then(data => {
           let mensagem = "";
-          // Verifica se a resposta é "não encontrado" (minúsculas para robustez)
-          if (data.toLowerCase().includes("não encontrado")) {
+
+          if (!data.found) { // Verifica a flag 'found' do JSON
             mensagem = `CEP ${cep} não encontrado.`;
           } else {
-            // Se não for "não encontrado", assume que é o conteúdo da coluna C
-            mensagem = `CEP ${cep} encontrado! Conteúdo relacionado: "${data}"`; 
+            // Se encontrado, verifica quais serviços estão no array 'services'
+            if (data.services.length === 1) {
+                mensagem = `CEP ${cep} encontrado para o serviço: ${data.services[0]}.`;
+            } else if (data.services.length > 1) {
+                // Junta os serviços com "e" antes do último para melhor leitura
+                const servicesString = data.services.join(", ").replace(/,([^,]*)$/, ' e $1');
+                mensagem = `CEP ${cep} encontrado para os serviços: ${servicesString}.`;
+            } else {
+                // Caso o array 'services' esteja vazio mesmo que 'found' seja true (contingência)
+                mensagem = `CEP ${cep} encontrado, mas nenhum serviço específico foi listado.`;
+            }
           }
 
           resultado.innerText = mensagem;
           novaPesquisa.style.display = "inline-block";
-          // O formulário já está escondido, apenas atualiza o resultado e mostra o botão
         })
         .catch(error => {
           console.error("Erro:", error);
           resultado.innerText = `Erro ao consultar o CEP ${cep}. Por favor, tente novamente.`;
           novaPesquisa.style.display = "inline-block";
-          // O formulário já está escondido
         });
     });
 
     novaPesquisa.addEventListener("click", function() {
-      location.reload(); // Recarrega a página para resetar o estado
+      location.reload(); 
     });
 
-    // Garante que o resultado esteja oculto no carregamento inicial da página
     document.addEventListener("DOMContentLoaded", function() {
         resultado.style.display = "none";
     });
